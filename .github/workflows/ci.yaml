@@ -18,3 +18,5 @@ jobs:
     - run: cargo clippy -- -D warnings
     - run: cargo build --verbose
     - run: cargo test --verbose
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
