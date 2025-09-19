@@ -1,25 +1,8 @@
-use clap::{
-    ColorChoice,
-    Parser,
-};
+mod args;
 
-#[derive(Parser, Debug)]
-#[command(
-    bin_name = "git commitgen",
-    color = ColorChoice::Auto,
-    version = env!("CARGO_PKG_VERSION"),
-    about = env!("CARGO_PKG_DESCRIPTION"),
-    long_about = env!("CARGO_PKG_DESCRIPTION"),
-    after_help = "Run `git commitgen help` for more detailed information."
-)]
-struct Args {
-    /// Changes intention
-    #[arg(short, long)]
-    intent: Option<String>,
-}
+use clap::Parser;
 
 fn main() {
-    let _args = Args::parse();
-
+    let _args = args::Args::parse();
     println!("Hello, world!");
 }
