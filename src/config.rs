@@ -14,8 +14,16 @@ use crate::{
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
-    pub provider: String,
+    pub provider: Provider,
     pub model: Option<String>,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "lowercase")]
+pub enum Provider {
+    Gemini,
+    Grok,
+    OpenAI,
 }
 
 /// Gets the root of the git repo via `git rev-parse --show-toplevel`
