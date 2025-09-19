@@ -18,7 +18,7 @@ use crate::{
 fn run() -> Result<()> {
     let args = Args::try_parse()?;
     let config = config::load()?;
-    let context = context::create(args.message)?;
+    let context = context::create(&args, &config)?;
     let provider = match &config.provider {
         config::Provider::Gemini => Gemini::new(config.model.clone()),
         _ => bail!("provider not implemented yet"),

@@ -88,6 +88,10 @@ impl Provider for Gemini {
             )
         })?;
 
+        println!("PROMPT");
+        println!("{}", prompt);
+        println!("----");
+
         let payload = Request {
             contents: vec![Content {
                 parts: vec![Part { text: prompt }],

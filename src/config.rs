@@ -13,6 +13,7 @@ use crate::{
 pub struct Config {
     pub provider: Provider,
     pub model: Option<String>,
+    pub examples: Option<String>,
 }
 
 #[derive(Deserialize, Debug)]
