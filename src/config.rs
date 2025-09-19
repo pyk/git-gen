@@ -1,8 +1,4 @@
 use std::fs;
-use std::{
-    path::PathBuf,
-    process::Command,
-};
 
 use serde::Deserialize;
 
@@ -10,6 +6,7 @@ use crate::error::Result;
 use crate::{
     bail,
     error,
+    git,
 };
 
 #[derive(Deserialize, Debug)]
@@ -26,39 +23,8 @@ pub enum Provider {
     OpenAI,
 }
 
-/// Gets the root of the git repo via `git rev-parse --show-toplevel`
-fn get_repo_root() -> Result<PathBuf> {
-    let output = Command::new("git")
-        .args(["rev-parse", "--show-toplevel"])
-        .output()
-        .map_err(|e| {
-            error!(
-                "failed to execute git command",
-                source: e,
-                help: "ensure that 'git' is installed and in your system's PATH"
-            )
-        })?;
-
-    if !output.status.success() {
-        bail!(
-            "not a git repository (or any of the parent directories)",
-            help: "please run 'git commitgen' from within a git repository"
-        );
-    }
-
-    let stdout = String::from_utf8(output.stdout).map_err(|e| {
-        error!(
-            "failed to parse 'git rev-parse --show-toplevel' command output",
-            source: e,
-            note: "the output from 'git rev-parse --show-toplevel' was not valid UTF-8"
-        )
-    })?;
-
-    Ok(PathBuf::from(stdout.trim()))
-}
-
 pub fn load() -> Result<Config> {
-    let repo_root = get_repo_root()?;
+    let repo_root = git::root()?;
     let config_path = repo_root.join("commitgen.toml");
 
     if !config_path.exists() {
