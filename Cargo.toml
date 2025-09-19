@@ -11,3 +11,4 @@ license = "MIT"
 categories = ["command-line-utilities"]
 
 [dependencies]
+clap = { version = "4.5", features = ["derive"] }  # Command-line args parser
