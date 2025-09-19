@@ -2,3 +2,6 @@
 
 # repomix
 repomix-*.xml
+
+# ignore env
+.env
