@@ -46,8 +46,6 @@ impl Error {
         }
     }
 
-    // TODO: remove this allowance once usage grow
-    #[allow(dead_code)]
     pub fn with_source(
         mut self,
         source: impl StdError + Send + Sync + 'static,

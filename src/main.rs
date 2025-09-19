@@ -1,14 +1,18 @@
+use clap::Parser;
+
 mod args;
+mod config;
 mod error;
 
 use args::Args;
 use error::Result;
 
-use clap::Parser;
-
 fn run() -> Result<()> {
     let _args = Args::try_parse()?;
-    println!("Hello, world!");
+    let config = config::load()?;
+    println!("Configuration loaded successfully!");
+    println!("{:#?}", config.provider);
+    println!("{:#?}", config.model);
     Ok(())
 }
 
