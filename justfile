@@ -1,3 +1,5 @@
+set dotenv-load
+
 # Build and install the binary
 install:
     cargo install --path . --force
@@ -38,3 +40,7 @@ repomix subcommand="":
             -o repomix-git-commitgen-$(date +%Y%m%d-%H%M%S).xml \
             --ignore ""
     fi
+
+# Run test
+test:
+    cargo test
