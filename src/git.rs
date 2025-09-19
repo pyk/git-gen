@@ -71,3 +71,27 @@ pub fn diff() -> Result<String> {
 
     Ok(diff)
 }
+
+/// Gets previous commits via `git log --oneline -10`
+pub fn previous_commits() -> Result<String> {
+    let output = Command::new("git")
+        .args(["log", "--oneline", "-10"])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .output()
+        .map_err(|e| {
+            error!(
+                "failed to execute git command",
+                source: e,
+                help: "ensure that 'git' is installed and in your system's PATH"
+            )
+        })?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        bail!("git log --oneline -10 failed: {}", stderr);
+    }
+
+    let prev_commits = String::from_utf8_lossy(&output.stdout).to_string();
+    Ok(prev_commits)
+}

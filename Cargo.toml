@@ -12,10 +12,13 @@ categories = ["command-line-utilities"]
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }  # Command-line args parser
-serde = { version = "1", features = ["derive"] }
-toml = "0.9"
+envfmt = "0.1"  # Variable expands
+rand = "0.9"  # For jittering http request
+serde = { version = "1", features = ["derive"] }  # Handle JSON and TOML
+toml = "0.9"  # TOML parsing
+ureq = { version = "3", features = ["json"] }  # Send request
 
 [build-dependencies]
 clap = { version = "4.5", features = ["derive"] }  # Command-line args parser
-clap_mangen = { version = "0.2" }
+clap_mangen = { version = "0.2" }  # Generate man page
 

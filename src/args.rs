@@ -13,7 +13,7 @@ use clap::{
     after_help = "Run 'git commitgen help' for more detailed information."
 )]
 pub struct Args {
-    /// Changes intention
+    /// Draft commit
     #[arg(short, long)]
-    intent: Option<String>,
+    pub message: Option<String>,
 }
