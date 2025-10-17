@@ -1,12 +1,12 @@
 [package]
-name = "git-commitgen"
+name = "git-gen"
 version = "0.1.0"
 authors = ["pyk <gm@pyk.sh>"]
 edition = "2024"
 description = "A git subcommand for writing better commits"
-documentation = "https://docs.rs/git-commitgen"
-homepage = "https://github.com/pyk/git-commitgen"
-repository = "https://github.com/pyk/git-commitgen"
+documentation = "https://docs.rs/git-gen"
+homepage = "https://github.com/pyk/git-gen"
+repository = "https://github.com/pyk/git-gen"
 license = "MIT"
 categories = ["command-line-utilities"]
 
