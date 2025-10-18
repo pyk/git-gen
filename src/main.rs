@@ -6,7 +6,7 @@ mod context;
 mod error;
 mod git;
 mod manifest;
-mod prompts;
+mod prompt;
 mod providers;
 
 use crate::{
@@ -19,15 +19,15 @@ use crate::{
 fn run() -> Result<()> {
     let args = Args::try_parse()?;
     let manifest = manifest::load()?;
+    let context = context::create()?;
+    let final_prompt = prompt::create(args.message, &manifest.prompt, &context);
+
     let config = &manifest.config;
-    let _prompt = &manifest.prompt;
-    let context = context::create(&args, config)?;
     let provider = match &config.provider {
         config::Provider::Gemini => Gemini::new(config.model.clone()),
         _ => bail!("provider not implemented yet"),
     };
-    let prompt = prompts::get(&config.provider)?;
-    let commits = provider.generate(&prompt, &context)?;
+    let commits = provider.generate(&final_prompt)?;
 
     println!("\nSuggested commit messages:");
     for (i, commit) in commits.iter().enumerate() {

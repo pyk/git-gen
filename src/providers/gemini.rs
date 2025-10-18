@@ -65,22 +65,12 @@ struct ContentResponse {
 }
 
 impl Provider for Gemini {
-    fn generate<C>(&self, template: &str, context: C) -> Result<Vec<String>>
-    where
-        C: envfmt::Context,
-    {
+    fn generate(&self, prompt: &str) -> Result<Vec<String>> {
         let api_key = env::var("GEMINI_API_KEY").map_err(|e| {
             error!(
                 "failed to read GEMINI_API_KEY",
                 source: e,
                 help: "please make sure GEMINI_API_KEY is defined"
-            )
-        })?;
-
-        let prompt = envfmt::format_with(template, &context).map_err(|e| {
-            error!(
-                "failed to generate prompt from template and context",
-                source: e
             )
         })?;
 
@@ -90,7 +80,9 @@ impl Provider for Gemini {
 
         let payload = Request {
             contents: vec![Content {
-                parts: vec![Part { text: prompt }],
+                parts: vec![Part {
+                    text: prompt.to_owned(),
+                }],
             }],
         };
 
@@ -173,20 +165,16 @@ impl Provider for Gemini {
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashMap;
 
     use super::*;
+    use crate::context::Context;
+    use crate::prompt;
 
     #[test]
     fn unknown_model() {
         let model = "random".to_string();
         let gemini = Gemini::new(Some(model));
-        let prompt = include_str!("../prompts/gemini.md");
-        let mut context = HashMap::new();
-        context.insert("DRAFT_MESSAGE", "test");
-        context.insert("GIT_COMMITS", "test");
-        context.insert("GIT_DIFF", "test");
-        let result = gemini.generate(prompt, context);
+        let result = gemini.generate("");
         let error = result.unwrap_err();
         assert!(error.message().contains("unknown model"));
     }
@@ -195,23 +183,8 @@ mod test {
     fn known_model() {
         let model = "gemini-2.5-flash-lite".to_string();
         let gemini = Gemini::new(Some(model));
-        let prompt = include_str!("../prompts/gemini.md");
-        let mut context = HashMap::new();
-        context.insert("DRAFT_MESSAGE", "add more dependencies");
-        context.insert("GIT_COMMITS", r#"
-            3943e8b (HEAD -> main, origin/main) feat: add context and git modules
-            7730132 chore: add commitgen
-            9e5e081 feat: use enum for the provider
-            68bcf27 fix: improves error message
-            ce084d5 chore: add config loader
-            e281295 chore: add error handling
-            d07b2cb feat: build the man page
-            d1f74f2 chore: ignore repomix files
-            f2638c6 feat: add clap
-            0d54d47 chore: add github ci
-        "#,
-        );
-        context.insert("GIT_DIFF", r#"
+        let draft_message = Some("add more dependencies".to_owned());
+        let git_diff =  r#"
             diff --git a/Cargo.toml b/Cargo.toml
             index 4583acd..80fb708 100644
             --- a/Cargo.toml
@@ -231,8 +204,22 @@ mod test {
              clap = { version = "4.5", features = ["derive"] }  # Command-line args parser
             -clap_mangen = { version = "0.2" }
             +clap_mangen = { version = "0.2" }  # Generate man page
-        "#);
-        let result = gemini.generate(prompt, context).unwrap();
+        "#.to_owned();
+        let git_log = r#"
+            3943e8b (HEAD -> main, origin/main) feat: add context and git modules
+            7730132 chore: add commitgen
+            9e5e081 feat: use enum for the provider
+            68bcf27 fix: improves error message
+            ce084d5 chore: add config loader
+            e281295 chore: add error handling
+            d07b2cb feat: build the man page
+            d1f74f2 chore: ignore repomix files
+            f2638c6 feat: add clap
+            0d54d47 chore: add github ci
+        "#.to_owned();
+        let context = Context { git_diff, git_log };
+        let final_prompt = prompt::create(draft_message, "", &context);
+        let result = gemini.generate(&final_prompt).unwrap();
         assert_eq!(result.len(), 5);
     }
 }

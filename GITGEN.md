@@ -1,5 +1,5 @@
 ---
-random
+provider = "gemini"
 ---
 
 some prompt
