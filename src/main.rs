@@ -5,6 +5,7 @@ mod config;
 mod context;
 mod error;
 mod git;
+mod manifest;
 mod prompts;
 mod providers;
 
@@ -17,20 +18,16 @@ use crate::{
 
 fn run() -> Result<()> {
     let args = Args::try_parse()?;
-    let config = config::load()?;
-    let context = context::create(&args, &config)?;
+    let manifest = manifest::load()?;
+    let config = &manifest.config;
+    let _prompt = &manifest.prompt;
+    let context = context::create(&args, config)?;
     let provider = match &config.provider {
         config::Provider::Gemini => Gemini::new(config.model.clone()),
         _ => bail!("provider not implemented yet"),
     };
     let prompt = prompts::get(&config.provider)?;
     let commits = provider.generate(&prompt, &context)?;
-    println!("Configuration loaded successfully!");
-    println!("{:#?}", config.provider);
-    println!("{:#?}", config.model);
-    println!("{:#?}", context);
-    println!("{:#?}", commits);
-    println!("Model: {}", provider.model());
 
     println!("\nSuggested commit messages:");
     for (i, commit) in commits.iter().enumerate() {
