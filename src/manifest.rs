@@ -10,7 +10,7 @@ use crate::git;
 #[derive(Debug)]
 pub struct Manifest {
     pub config: Config,
-    pub prompt: String,
+    pub user_prompt: String,
 }
 
 /// Loads and parses the GITGEN.md manifest from the repository root.
@@ -78,7 +78,7 @@ pub fn parse(content: &str) -> Result<Manifest> {
 
     Ok(Manifest {
         config,
-        prompt: prompt_str.to_string(),
+        user_prompt: prompt_str.to_string(),
     })
 }
 

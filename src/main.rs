@@ -20,7 +20,11 @@ fn run() -> Result<()> {
     let args = Args::try_parse()?;
     let manifest = manifest::load()?;
     let context = context::create()?;
-    let final_prompt = prompt::create(args.message, &manifest.prompt, &context);
+    let final_prompt = prompt::create(
+        args.message, //
+        &manifest.user_prompt,
+        &context,
+    );
 
     let config = &manifest.config;
     let provider = match &config.provider {
