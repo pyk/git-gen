@@ -6,7 +6,7 @@ use crate::error;
 use crate::error::Result;
 use crate::git;
 
-/// Represents the entire parsed content of the GITGEN.md manifest file
+/// Represents the entire parsed content of the GITGEN.md manifest file.
 #[derive(Debug)]
 pub struct Manifest {
     pub config: Config,
@@ -36,6 +36,13 @@ pub fn load() -> Result<Manifest> {
         )
     })?;
 
+    parse(&content).map_err(
+        |e| error!("failed to parse '{}'", manifest_path.display(), source: e),
+    )
+}
+
+/// Parses the content of a GITGEN.md file.
+pub fn parse(content: &str) -> Result<Manifest> {
     if !content.starts_with("---") {
         bail!("'GITGEN.md' must start with TOML frontmatter delimited by ---");
     }
@@ -63,4 +70,17 @@ pub fn load() -> Result<Manifest> {
         config,
         prompt: prompt_str.to_string(),
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_empty_manifest() {
+        let content = r#""#;
+        let result = parse(content);
+        let error = result.unwrap_err();
+        assert!(error.message().contains("ok"));
+    }
 }
