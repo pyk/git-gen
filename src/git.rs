@@ -24,9 +24,14 @@ pub fn root() -> Result<PathBuf> {
         })?;
 
     if !output.status.success() {
+        // Get the current directory to make the error message more helpful.
+        let current_dir = std::env::current_dir().map_or_else(
+            |_| "the current directory".to_string(),
+            |p| format!("'{}'", p.display()),
+        );
         bail!(
-            "not a git repository (or any of the parent directories)",
-            help: "please run 'git commitgen' from within a git repository"
+            "{} is not a git repository (or any of the parent directories)", current_dir,
+            help: "please run 'git gen' from within a git repository"
         );
     }
 
