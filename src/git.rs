@@ -17,7 +17,7 @@ pub fn root() -> Result<PathBuf> {
         .output()
         .map_err(|e| {
             error!(
-                "failed to execute git command",
+                "failed to execute 'git rev-parse --show-toplevel'",
                 source: e,
                 help: "ensure that 'git' is installed and in your system's PATH"
             )
@@ -55,7 +55,7 @@ pub fn diff() -> Result<String> {
         .output()
         .map_err(|e| {
             error!(
-                "failed to execute git command",
+                "failed to execute 'git diff --staged'",
                 source: e,
                 help: "ensure that 'git' is installed and in your system's PATH"
             )
@@ -63,7 +63,7 @@ pub fn diff() -> Result<String> {
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        bail!("git diff failed: {}", stderr);
+        bail!("'git diff --staged' command failed: {}", stderr);
     }
 
     let diff = String::from_utf8_lossy(&output.stdout).to_string();
@@ -86,7 +86,7 @@ pub fn previous_commits() -> Result<String> {
         .output()
         .map_err(|e| {
             error!(
-                "failed to execute git command",
+                "failed to execute 'git log --oneline -10'",
                 source: e,
                 help: "ensure that 'git' is installed and in your system's PATH"
             )
@@ -94,7 +94,7 @@ pub fn previous_commits() -> Result<String> {
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        bail!("git log --oneline -10 failed: {}", stderr);
+        bail!("'git log --oneline -10' command failed: {}", stderr);
     }
 
     let prev_commits = String::from_utf8_lossy(&output.stdout).to_string();
