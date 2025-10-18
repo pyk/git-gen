@@ -32,10 +32,6 @@ impl Gemini {
         );
         Self { model, url }
     }
-
-    pub fn model(&self) -> String {
-        self.model.clone()
-    }
 }
 
 #[derive(Serialize)]
