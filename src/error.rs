@@ -83,7 +83,6 @@ impl Error {
 
         // Next `note:` if any
         if !self.notes.is_empty() {
-            lines.push("".to_string());
             for help in &self.notes {
                 lines.push(format!("{}: {}", green("note"), help));
             }
@@ -91,7 +90,6 @@ impl Error {
 
         // Next `help:` if any
         if !self.helps.is_empty() {
-            lines.push("".to_string());
             for help in &self.helps {
                 lines.push(format!("{}: {}", green("help"), help));
             }
