@@ -32,37 +32,47 @@ pub fn load() -> Result<Manifest> {
         error!(
             "failed to read manifest file at '{}'", manifest_path.display(),
             source: e,
-             help: "please check file's permissions"
+            help: "please check file's permissions"
         )
     })?;
 
-    parse(&content).map_err(
-        |e| error!("failed to parse '{}'", manifest_path.display(), source: e),
-    )
+    parse(&content).map_err(|e| {
+        e.note(format!(
+            "the error occurred in file '{}'",
+            manifest_path.display()
+        ))
+    })
 }
 
 /// Parses the content of a GITGEN.md file.
 pub fn parse(content: &str) -> Result<Manifest> {
     if !content.starts_with("---") {
-        bail!("'GITGEN.md' must start with TOML frontmatter delimited by ---");
+        bail!("manifest must start with TOML frontmatter delimited by '---'");
     }
     let parts: Vec<&str> = content.splitn(3, "---").collect();
     if parts.len() < 3 {
-        bail!("'GITGEN.md' frontmatter is not closed with '---'");
+        bail!("manifest frontmatter is not closed with '---'");
     }
 
     let frontmatter_str = parts[1];
     let prompt_str = parts[2];
 
+    if frontmatter_str.trim().is_empty() {
+        bail!(
+            "TOML frontmatter cannot be empty",
+            help: "you must specify at least the 'provider'"
+        );
+    }
+
     if prompt_str.trim().is_empty() {
-        bail!("'GITGEN.md' is missing the prompt after the frontmatter");
+        bail!("manifest is missing the prompt after the frontmatter");
     }
 
     let config: Config = toml::from_str(frontmatter_str).map_err(|e| {
         error!(
-            "failed to parse TOML frontmatter in 'GITGEN.md' manifest",
+            "failed to parse TOML frontmatter in manifest",
             source: e,
-            help: "please check check for syntax errors or invalid values"
+            help: "please check for syntax errors or invalid values in your manifest config"
         )
     })?;
 
@@ -81,6 +91,52 @@ mod tests {
         let content = r#""#;
         let result = parse(content);
         let error = result.unwrap_err();
-        assert!(error.message().contains("ok"));
+        assert!(error.message().contains(
+            "manifest must start with TOML frontmatter delimited by '---'"
+        ));
+    }
+
+    #[test]
+    fn test_parse_empty_frontmatter() {
+        let content = r#"---
+---
+
+some prompt
+"#;
+        let result = parse(content);
+        let error = result.unwrap_err();
+        assert!(error.message().contains("TOML frontmatter cannot be empty"));
+    }
+
+    #[test]
+    fn test_parse_empty_prompt() {
+        let content = r#"---
+random
+---
+"#;
+        let result = parse(content);
+        let error = result.unwrap_err();
+        assert!(
+            error.message().contains(
+                "manifest is missing the prompt after the frontmatter"
+            )
+        );
+    }
+
+    #[test]
+    fn test_parse_invalid_config() {
+        let content = r#"---
+random
+---
+some prompt
+"#;
+        let result = parse(content);
+        let error = result.unwrap_err();
+        println!("{}", error.message());
+        assert!(
+            error
+                .message()
+                .contains("failed to parse TOML frontmatter in manifest")
+        );
     }
 }
