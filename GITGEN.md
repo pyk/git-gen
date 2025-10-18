@@ -22,6 +22,9 @@ The commit message must follow this structure:
 - The **subject** line must be 50 characters or less.
 - The **body**, if included, must be hard-wrapped at 72 characters.
 - The `type` and `scope` must be lowercase.
+- Do not use formal or academic words, for example avoid the usage of
+  "incorporate", "streamline" etc.
+- The commit message should be personal and not professional at all.
 
 ## Available Types
 
